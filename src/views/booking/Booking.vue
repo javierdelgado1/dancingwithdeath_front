@@ -71,6 +71,17 @@
                             required
                           ></v-autocomplete>
                         </v-flex>
+                        <v-flex xs12>
+                          <v-text-field 
+                                v-model="form.email"
+                                label="Email"
+                                :rules="emailRules"
+                                placeholder="Type your contact email"
+                                append-icon="email"
+                                outline
+                                required
+                              ></v-text-field>
+                        </v-flex>
                       </v-layout>
                     </v-container>
                   </v-form>
@@ -113,7 +124,7 @@
             <template slot="items" slot-scope="props">
               <td>{{ formatDate( props.item.date, "DD-MM-YYYY") }}</td>
               <td>{{ props.item.available_hours_id.hour}}</td>
-              <td>{{ props.item.user_id.email }}</td>
+              <td>{{ props.item.contact_email }}</td>
               <td class="text-center">
                 <v-btn fab dark small icon color="primary" @click="openModalEdit(props.item)">
                   <v-icon class="zmdi zmdi-edit"></v-icon>
@@ -191,6 +202,13 @@ export default {
         { text: "Actions", sortable: false, align: "center" }
       ],
       hourRules: [v => !!v || "Please, select a hour"],
+      emailRules: [
+        v => !!v || "Please, enter the email",
+        v => {
+          const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+          return pattern.test(v) || "Please, type a valid e-mail.";
+        }
+      ],
       datatableLoader: true,
       snackbar: false,
       snackbarMessage: "",
@@ -230,6 +248,7 @@ export default {
             .post("booking/" + this.form.selected.id, {
               date: this.form.date,
               hour_id: this.form.hour_id,
+              email: this.form.email,
               _method: "put"
             })
             .then(response => {
@@ -272,7 +291,8 @@ export default {
     openModalEdit(selected) {
       this.form.dialog = true;
       this.form.selected = selected;
-      this.form.date = selected.date;
+      this.form.date = this.formatDate(selected.date, "YYYY-MM-DD");
+      this.form.email = selected.contact_email;
       this.form.hour = selected.available_hours_id.hour;
       this.isEdit = true;
     },
