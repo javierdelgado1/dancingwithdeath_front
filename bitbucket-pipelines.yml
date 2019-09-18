@@ -1,0 +1,13 @@
+pipelines:
+  default: 
+  - step:
+      name: Build and test
+      deployment: test
+      script:
+       - pipe: atlassian/sftp-deploy:0.4.1
+         variables:
+           USER: 'root'
+           SERVER: '162.243.167.103'
+           SSH_KEY: 'autopafbdd'
+           REMOTE_PATH: '/var/www/build/localbitcoin_frontend_meerkat/dist'
+           LOCAL_PATH: 'dist/*' 
